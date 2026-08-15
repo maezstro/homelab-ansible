@@ -1,0 +1,5 @@
+nas_mounts:
+  - { host: "192.168.0.76", share: "downloads",  mount: "/mnt/nas/downloads"  }
+  - { host: "192.168.0.76", share: "media",      mount: "/mnt/nas/media"      }
+  - { host: "192.168.0.76", share: "downloads2", mount: "/mnt/nas/downloads2" }
+  - { host: "192.168.0.76", share: "media2",     mount: "/mnt/nas/media2"     }

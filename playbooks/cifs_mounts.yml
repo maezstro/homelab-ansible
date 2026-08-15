@@ -1,0 +1,37 @@
+---
+- hosts: serverchan
+  become: true
+
+  tasks:
+    - name: Install cifs-utils
+      apt:
+        name: cifs-utils
+        state: present
+
+    - name: Create NAS credentials file
+      copy:
+        content: |
+          username={{ vault_nas_username }}
+          password={{ vault_nas_password }}
+        dest: /etc/samba/nas-credentials
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Ensure NAS mount points exist
+      file:
+        path: "{{ item.mount }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: '0775'
+      loop: "{{ nas_mounts }}"
+
+    - name: Mount CIFS shares
+      ansible.posix.mount:
+        path: "{{ item.mount }}"
+        src: "//{{ item.host }}/{{ item.share }}"
+        fstype: cifs
+        opts: "credentials=/etc/samba/nas-credentials,uid=1000,gid=1000,file_mode=0664,dir_mode=0775,_netdev,hard,actimeo=5"
+        state: mounted
+      loop: "{{ nas_mounts }}"

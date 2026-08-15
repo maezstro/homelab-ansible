@@ -1,0 +1,5 @@
+nordvpn_user: "{{ vault_nordvpn_user }}"
+nordvpn_password: "{{ vault_nordvpn_password }}"
+homarr_secret_key: "{{ vault_homarr_secret_key }}"
+nas_username: "{{ vault_nas_username }}"
+nas_password: "{{ vault_nas_password }}"

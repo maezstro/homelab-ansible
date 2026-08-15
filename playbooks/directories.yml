@@ -1,0 +1,40 @@
+- name: Create arr-stack config directories
+  hosts: serverchan
+  become: true
+  vars:
+    services:
+      - gluetun
+      - qbittorrent
+      - sonarr
+      - radarr
+      - prowlarr
+      - profilarr
+      - bazarr
+      - jellyfin
+      - jellyseerr
+      - ersatztv
+      - homarr
+      - notifiarr
+      - npm
+      - mealie
+
+  tasks:
+    - name: Create config directories for each service
+      ansible.builtin.file:
+        path: "/media/arr/{{ item }}/config"
+        state: directory
+        owner: maezstro
+        group: maezstro
+        mode: '0755'
+      loop: "{{ services }}"
+
+    - name: Create NAS mount point directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: maezstro
+        group: maezstro
+        mode: '0755'
+      loop:
+        - /mnt/nas/media
+        - /mnt/nas/media2
