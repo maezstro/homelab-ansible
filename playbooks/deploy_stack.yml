@@ -1,0 +1,44 @@
+---
+- name: Deploy homelab Docker stack
+  hosts: serverchan
+
+  vars:
+    stack_repo_dest: "/home/maezstro/.deploy/homelab-stack"
+    stack_repo_url: "https://github.com/maezstro/homelab-stack.git"
+
+  tasks:
+    - name: Clone or update homelab-stack repo
+      git:
+        repo: "{{ stack_repo_url }}"
+        dest: "{{ stack_repo_dest }}"
+        version: main
+        force: yes
+
+    - name: Copy main docker-compose.yml to home directory (only if missing)
+      copy:
+        src: "{{ stack_repo_dest }}/compose/docker-compose.yml"
+        dest: "/home/maezstro/docker-compose.yml"
+        remote_src: true
+        force: no
+
+    - name: Copy Mealie compose file to home directory (only if missing)
+      copy:
+        src: "{{ stack_repo_dest }}/compose/mealie-docker-compose.yaml"
+        dest: "/home/maezstro/mealie-docker-compose.yaml"
+        remote_src: true
+        force: no
+    - name: Template .env file with secrets
+      template:
+        src: templates/env.j2
+        dest: "/home/maezstro/.env"
+        mode: '0600'
+
+    - name: Bring up main stack
+      command: docker compose -f /home/maezstro/docker-compose.yml --env-file /home/maezstro/.env up -d
+      args:
+        chdir: /home/maezstro
+
+    - name: Bring up Mealie stack
+      command: docker compose -p mealie -f /home/maezstro/mealie-docker-compose.yaml up -d
+      args:
+        chdir: /home/maezstro
